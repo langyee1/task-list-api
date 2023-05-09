@@ -3,6 +3,7 @@ from sqlalchemy import text
 from app.models.task import Task
 from app import db
 from .routes_helpers import validate_model
+from datetime import datetime
 
 bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 
@@ -70,4 +71,27 @@ def delete_task(id):
     db.session.delete(task)
     db.session.commit()
     
+    return make_response(jsonify(result),200)
+
+# PATCH ONE ENDPOINT
+@bp.route("/<id>/mark_complete", methods=["PATCH"])
+def patch_task_complete(id):
+    task = validate_model(Task, id)
+
+    task.completed_at = datetime.now()
+
+
+    db.session.commit()
+    result=dict(task=task.to_dict()) 
+    return make_response(jsonify(result),200)
+
+@bp.route("/<id>/mark_incomplete", methods=["PATCH"])
+def patch_task_incomplete(id):
+    task = validate_model(Task, id)
+
+    task.completed_at = None
+
+
+    db.session.commit()
+    result=dict(task=task.to_dict()) 
     return make_response(jsonify(result),200)

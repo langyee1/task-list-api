@@ -33,17 +33,16 @@ def create_task():
 
 
 # GET ONE ENDPOINT
-@bp.route("/<task_id>", methods=["GET"])
-def handle_task(task_id):
-    task = validate_model(Task, task_id)
-    return jsonify(task.to_dict()), 200
-
-
+@bp.route("/<id>", methods=["GET"])
+def handle_task(id):
+    task = validate_model(Task, id)
+    result=dict(task=task.to_dict())
+    return make_response(jsonify(result),200)
 
 # UPDATE ONE ENDPOINT
-@bp.route("/<task_id>", methods=["PUT"])
-def update_task(task_id):
-    task = validate_model(Task, task_id)
+@bp.route("/<id>", methods=["PUT"])
+def update_task(id):
+    task = validate_model(Task, id)
     request_body = request.get_json()
 
     task.title = request_body["title"]
@@ -56,9 +55,9 @@ def update_task(task_id):
 
 
 # DELETE ONE ENDPOINT
-@bp.route("/<task_id>", methods=["DELETE"])
-def delete_task(task_id):
-    task = validate_model(Task, task_id)
+@bp.route("/<id>", methods=["DELETE"])
+def delete_task(id):
+    task = validate_model(Task, id)
 
     db.session.delete(task)
     db.session.commit()

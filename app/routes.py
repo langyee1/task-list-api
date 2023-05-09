@@ -36,8 +36,8 @@ def create_task():
 @bp.route("/<task_id>", methods=["GET"])
 def handle_task(task_id):
     task = validate_model(Task, task_id)
-
     return jsonify(task.to_dict()), 200
+
 
 
 # UPDATE ONE ENDPOINT

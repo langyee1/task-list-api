@@ -2,7 +2,7 @@ from app import db
 
 
 class Task(db.Model):
-    task_id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String)
     description = db.Column(db.String)
     completed_at = db.Column(db.DateTime, default=None)
@@ -16,10 +16,12 @@ class Task(db.Model):
         )
 
     def to_dict(self):
+        #if not self.completed_at:
+        #    is_complete_temp=False
         return dict(
-            task_id=self.task_id,
+            id=self.id,
             title=self.title,
             description=self.description,
-            completed_at=self.completed_at
+            is_complete=self.completed_at != None
         )        
     

@@ -24,12 +24,17 @@ def handle_tasks():
 def create_task():
     request_body = request.get_json()
 
+    if request_body.get("title") is None or request_body.get("description") is None:
+        result=dict(details='Invalid data') 
+        return make_response(jsonify(result),400)
+
     new_task = Task.from_dict(request_body)
 
     db.session.add(new_task)
     db.session.commit()
+    result=dict(task=new_task.to_dict()) 
+    return make_response(jsonify(result),201)
 
-    return make_response(f"task {new_task.title} successfully created", 201)
 
 
 # GET ONE ENDPOINT
@@ -47,20 +52,18 @@ def update_task(id):
 
     task.title = request_body["title"]
     task.description = request_body["description"]
-    task.completed_at = request_body["completed_at"]
 
     db.session.commit()
-
-    return make_response(f"task {task.title} successfully updated", 200)
+    result=dict(task=task.to_dict()) 
+    return make_response(jsonify(result),200)
 
 
 # DELETE ONE ENDPOINT
 @bp.route("/<id>", methods=["DELETE"])
 def delete_task(id):
     task = validate_model(Task, id)
-
+    result=dict(details=f'Task {task.id} "{task.title}" successfully deleted') 
     db.session.delete(task)
     db.session.commit()
-
-    return make_response(f"task {task.title} successfully deleted", 200)
-
+    
+    return make_response(jsonify(result),200)

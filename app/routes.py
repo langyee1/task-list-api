@@ -1,4 +1,5 @@
 from flask import Blueprint, jsonify, abort, make_response, request
+from sqlalchemy import text
 from app.models.task import Task
 from app import db
 from .routes_helpers import validate_model
@@ -9,9 +10,12 @@ bp = Blueprint("tasks", __name__, url_prefix="/tasks")
 # GET ALL ENDPOINT
 @bp.route("", methods=["GET"])
 def handle_tasks():
-    title_param = request.args.get("title")
-    if title_param:
-        tasks = Task.query.filter_by(title=title_param)
+
+    if request.args.get("sort") == "asc":
+        tasks = Task.query.order_by(text("title asc"))
+    elif request.args.get("sort") == "desc":
+        tasks = Task.query.order_by(text("title desc"))
+
     else:
         tasks = Task.query.all()
     tasks_list = [task.to_dict() for task in tasks]

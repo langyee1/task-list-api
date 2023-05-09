@@ -1,12 +1,13 @@
 from flask import Blueprint, jsonify, abort, make_response, request
 from sqlalchemy import text
 from app.models.task import Task
+from app.models.goal import Goal
 from app import db
 from .routes_helpers import validate_model
 from datetime import datetime
 
 bp = Blueprint("tasks", __name__, url_prefix="/tasks")
-
+goal_bp = Blueprint("goals", __name__,url_prefix="/goals")
 
 # GET ALL ENDPOINT
 @bp.route("", methods=["GET"])
@@ -94,4 +95,63 @@ def patch_task_incomplete(id):
 
     db.session.commit()
     result=dict(task=task.to_dict()) 
+    return make_response(jsonify(result),200)
+
+#**************************************************
+
+# GET ALL ENDPOINT
+@goal_bp.route("", methods=["GET"])
+def handle_goals():
+    goals = Goal.query.all()
+    goals_list = [goal.to_dict() for goal in goals]
+
+    return jsonify(goals_list), 200
+
+
+# CREATE ENDPOINT
+@goal_bp.route("", methods=["POST"])
+def create_goal():
+    request_body = request.get_json()
+
+    if request_body.get("title") is None:
+        result=dict(details='Invalid data') 
+        return make_response(jsonify(result),400)
+
+    new_goal = Goal.from_dict(request_body)
+
+    db.session.add(new_goal)
+    db.session.commit()
+    result=dict(goal=new_goal.to_dict()) 
+    return make_response(jsonify(result),201)
+
+
+# GET ONE ENDPOINT
+@goal_bp.route("/<goal_id>", methods=["GET"])
+def handle_goal(goal_id):
+    goal = validate_model(Goal, goal_id)
+    result=dict(goal=goal.to_dict())
+    return make_response(jsonify(result),200)
+
+
+# UPDATE ONE ENDPOINT
+@goal_bp.route("/<goal_id>", methods=["PUT"])
+def update_goal(goal_id):
+    goal = validate_model(Goal, goal_id)
+    request_body = request.get_json()
+
+    goal.title = request_body["title"]
+
+    db.session.commit()
+    result=dict(goal=goal.to_dict()) 
+    return make_response(jsonify(result),200)
+
+
+# DELETE ONE ENDPOINT
+@goal_bp.route("/<goal_id>", methods=["DELETE"])
+def delete_goal(goal_id):
+    goal = validate_model(Goal, goal_id)
+    result=dict(details=f'Goal {goal.goal_id} "{goal.title}" successfully deleted') 
+    db.session.delete(goal)
+    db.session.commit()
+    
     return make_response(jsonify(result),200)

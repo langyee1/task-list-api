@@ -180,13 +180,13 @@ def create_task(goal_id_parent):
 @goal_bp.route("/<goal_id_parent>/tasks", methods=["GET"])
 def handle_tasks_from_goal(goal_id_parent):
     goal = validate_model(Goal,goal_id_parent)
-    tasks = [task.validate_model(Task,goal. for task in )]
+    #tasks = [task.validate_model(Task,goal. for task in )]
         
     result = dict(id=goal.goal_id,
                     title=goal.title,
                     tasks=[task.id for task in task_query])
-    
-    return make_response(jsonify(result),200)
+    pass
+    #return make_response(jsonify(result),200)
 
     
 

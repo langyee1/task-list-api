@@ -6,13 +6,15 @@ class Task(db.Model):
     title = db.Column(db.String)
     description = db.Column(db.String)
     completed_at = db.Column(db.DateTime, default=None)
+    goal = db.relationship("Goal", back_populates="tasks")
+    goal_id_parent = db.Column(db.Integer, db.ForeignKey("goal.goal_id"))
 
     @classmethod
-    def from_dict(cls, data_dict):
+    def from_dict(cls, data_dict, goal=None):
         return cls(
             title=data_dict["title"],
-            description=data_dict["description"]
-            #completed_at=data_dict["completed_at"]
+            description=data_dict["description"],
+            goal=goal
         )
 
     def to_dict(self):

@@ -97,7 +97,7 @@ def patch_task_incomplete(id):
     result=dict(task=task.to_dict()) 
     return make_response(jsonify(result),200)
 
-#**************************************************
+#****************************GOAL ROUTES***********************
 
 # GET ALL ENDPOINT
 @goal_bp.route("", methods=["GET"])
@@ -126,17 +126,17 @@ def create_goal():
 
 
 # GET ONE ENDPOINT
-@goal_bp.route("/<goal_id>", methods=["GET"])
-def handle_goal(goal_id):
-    goal = validate_model(Goal, goal_id)
+@goal_bp.route("/<goal_id_parent>", methods=["GET"])
+def handle_goal(goal_id_parent):
+    goal = validate_model(Goal, goal_id_parent)
     result=dict(goal=goal.to_dict())
     return make_response(jsonify(result),200)
 
 
 # UPDATE ONE ENDPOINT
-@goal_bp.route("/<goal_id>", methods=["PUT"])
-def update_goal(goal_id):
-    goal = validate_model(Goal, goal_id)
+@goal_bp.route("/<goal_id_parent>", methods=["PUT"])
+def update_goal(goal_id_parent):
+    goal = validate_model(Goal, goal_id_parent)
     request_body = request.get_json()
 
     goal.title = request_body["title"]
@@ -147,11 +147,50 @@ def update_goal(goal_id):
 
 
 # DELETE ONE ENDPOINT
-@goal_bp.route("/<goal_id>", methods=["DELETE"])
-def delete_goal(goal_id):
-    goal = validate_model(Goal, goal_id)
+@goal_bp.route("/<goal_id_parent>", methods=["DELETE"])
+def delete_goal(goal_id_parent):
+    goal = validate_model(Goal, goal_id_parent)
     result=dict(details=f'Goal {goal.goal_id} "{goal.title}" successfully deleted') 
     db.session.delete(goal)
     db.session.commit()
     
     return make_response(jsonify(result),200)
+
+#****************************ONE TO MANY***********************
+
+
+# CREATE TASK BY GOAL ENDPOINT
+@goal_bp.route("/<goal_id_parent>/tasks", methods=["POST"])
+def create_task(goal_id_parent):
+    goal = validate_model(Goal,goal_id_parent)
+    request_body = request.get_json()
+
+    tasks_list_dict = request_body
+    for task_id in tasks_list_dict["task_ids"]:
+        task=validate_model(Task,task_id)
+        task.goal=goal
+
+    db.session.commit()
+    result=dict(id=goal.goal_id,
+                task_ids=tasks_list_dict["task_ids"])
+
+    return make_response(jsonify(result), 200)
+
+# GET ALL TASKS BY GOAL ENDPOINT
+@goal_bp.route("/<goal_id_parent>/tasks", methods=["GET"])
+def handle_tasks_from_goal(goal_id_parent):
+    goal = validate_model(Goal,goal_id_parent)
+    tasks = [task.validate_model(Task,goal. for task in )]
+        
+    result = dict(id=goal.goal_id,
+                    title=goal.title,
+                    tasks=[task.id for task in task_query])
+    
+    return make_response(jsonify(result),200)
+
+    
+
+
+
+
+

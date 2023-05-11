@@ -27,3 +27,4 @@ class Task(db.Model):
             is_complete=self.completed_at != None
         )        
     
+ 

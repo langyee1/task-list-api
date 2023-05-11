@@ -46,6 +46,7 @@ def create_task():
 @bp.route("/<id>", methods=["GET"])
 def handle_task(id):
     task = validate_model(Task, id)
+
     result=dict(task=task.to_dict())
     return make_response(jsonify(result),200)
 
@@ -180,13 +181,17 @@ def create_task(goal_id_parent):
 @goal_bp.route("/<goal_id_parent>/tasks", methods=["GET"])
 def handle_tasks_from_goal(goal_id_parent):
     goal = validate_model(Goal,goal_id_parent)
-    #tasks = [task.validate_model(Task,goal. for task in )]
-        
+    tasks=goal.tasks
+    tasks_lists = [validate_model(Task,task.id).to_dict() for task in tasks]
+
+    for task_dict in tasks_lists:
+        task_dict["goal_id"]=int(goal_id_parent)
+
     result = dict(id=goal.goal_id,
                     title=goal.title,
-                    tasks=[task.id for task in task_query])
-    pass
-    #return make_response(jsonify(result),200)
+                    tasks=tasks_lists)
+    
+    return make_response(jsonify(result),200)
 
     
 

@@ -46,9 +46,6 @@ def create_task():
 @bp.route("/<id>", methods=["GET"])
 def handle_task(id):
     task = validate_model(Task, id).to_dict()
-    #if task.goal:
-     #   task["goal_id"]=task.goal_id_parent
-
     result=dict(task=task)
     return make_response(jsonify(result),200)
 

@@ -18,13 +18,23 @@ class Task(db.Model):
         )
 
     def to_dict(self):
-
-        return dict(
+        dictionary={}
+        if self.goal:
+            dictionary=dict(
             id=self.id,
             title=self.title,
             description=self.description,
-            #goal_id=self.goal_id_parent,
+            goal_id=self.goal_id_parent,
+            is_complete=self.completed_at != None
+        )      
+        else:
+            dictionary=dict(
+            id=self.id,
+            title=self.title,
+            description=self.description,
             is_complete=self.completed_at != None
         )        
+            
+        return dictionary
     
  

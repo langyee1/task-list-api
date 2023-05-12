@@ -1,4 +1,6 @@
 from flask import Blueprint, jsonify, abort, make_response, request
+import requests
+import os
 from sqlalchemy import text
 from app.models.task import Task
 from app.models.goal import Goal
@@ -83,8 +85,21 @@ def patch_task_complete(id):
 
 
     db.session.commit()
-    result=dict(task=task.to_dict()) 
-    return make_response(jsonify(result),200)
+
+    path="https://slack.com/api/chat.postMessage"
+    params={
+        "channel":"C057EB36R4K",
+        "text": f"Task\"{task.title}\" has been completed!"
+        }
+    
+    headers = {"Authorization": os.environ.get("SLACK_API_KEY")}
+    response = requests.post(path,params=params,headers=headers)
+    
+
+    return jsonify({"task":task.to_dict()}),200
+
+    #result=dict(task=task.to_dict()) 
+    #return make_response(jsonify(result),200)
 
 @bp.route("/<id>/mark_incomplete", methods=["PATCH"])
 def patch_task_incomplete(id):
